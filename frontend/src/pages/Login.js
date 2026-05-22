@@ -35,12 +35,13 @@ const Login = () => {
 
       // Save user
      localStorage.setItem(
+  "token",
+  response.data.token
+);
+
+localStorage.setItem(
   "user",
-  JSON.stringify({
-    id: res.data.user._id,
-    username: res.data.user.username,
-    email: res.data.user.email
-  })
+  JSON.stringify(response.data.user)
 );
 
       // Redirect to dashboard
