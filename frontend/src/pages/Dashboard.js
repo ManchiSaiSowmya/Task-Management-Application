@@ -19,8 +19,13 @@ const Dashboard = () => {
   try {
     const user = JSON.parse(localStorage.getItem("user"));
 
+if (!user?._id) {
+  console.error("Invalid user in localStorage:", user);
+  return;
+}
+
     const res = await fetch(
-      `https://task-manager-api-np4w.onrender.com/tasks?userId=${user?.id}`
+      `https://task-manager-api-np4w.onrender.com/tasks?userId=${user._id}`
     );
 
     const data = await res.json();
@@ -45,12 +50,17 @@ const Dashboard = () => {
 
   const user = JSON.parse(localStorage.getItem("user"));
 
+if (!user?._id) {
+  console.error("Invalid user in localStorage:", user);
+  return;
+}
+
   console.log("TASK TITLE:", taskTitle);
   console.log("USER:", user);
 
   const payload = {
     title: taskTitle,
-    userId:user?.id,   
+    userId:user._id,   
   };
 
   console.log("PAYLOAD SENT:", payload);
