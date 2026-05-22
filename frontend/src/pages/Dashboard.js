@@ -1,4 +1,8 @@
-import React, { useEffect, useState } from "react";
+import React, {
+  useEffect,
+  useState,
+  useCallback,
+} from "react";
 import { useNavigate } from "react-router-dom";
 
 const API_URL = "https://task-manager-api-np4w.onrender.com";
@@ -63,7 +67,7 @@ const Dashboard = () => {
     }
 
     fetchTasks();
-  }, [user, navigate]);
+  },  [user, navigate, fetchTasks]);
 
   // CREATE TASK
   const handleCreateTask = async () => {
