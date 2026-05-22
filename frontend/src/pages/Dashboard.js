@@ -17,53 +17,6 @@ const Dashboard = () => {
 
   console.log("USER FROM STORAGE:", user);
 
-  // CHECK LOGIN
-  useEffect(() => {
-  const fetchTasks = async () => {
-    try {
-      if (!user?._id && !user?.id) {
-        console.error("Invalid user:", user);
-        return;
-      }
-
-      setLoading(true);
-
-      const userId = user._id || user.id;
-
-      const res = await fetch(
-        `${API_URL}/tasks?userId=${userId}`
-      );
-
-      const data = await res.json();
-
-      console.log("FETCH TASKS RESPONSE:", data);
-
-      const normalized = Array.isArray(data)
-        ? data
-        : data.tasks || [];
-
-      const sortedTasks = normalized.sort(
-        (a, b) =>
-          new Date(b.createdAt) -
-          new Date(a.createdAt)
-      );
-
-      setTasks(sortedTasks);
-    } catch (err) {
-      console.log("FETCH ERROR:", err);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  if (!user) {
-    navigate("/login");
-    return;
-  }
-
-  fetchTasks();
-
-}, [user, navigate]);
   // FETCH TASKS
   const fetchTasks = async () => {
     try {
@@ -101,6 +54,16 @@ const Dashboard = () => {
       setLoading(false);
     }
   };
+
+  // CHECK LOGIN + LOAD TASKS
+  useEffect(() => {
+    if (!user) {
+      navigate("/login");
+      return;
+    }
+
+    fetchTasks();
+  }, [user, navigate]);
 
   // CREATE TASK
   const handleCreateTask = async () => {
@@ -426,9 +389,6 @@ const Dashboard = () => {
     </div>
   );
 };
-
-export default Dashboard;
-
 const styles = {
   page: {
     fontFamily: "Arial",
@@ -570,3 +530,5 @@ const styles = {
     cursor: "pointer",
   },
 };
+
+export default Dashboard;
