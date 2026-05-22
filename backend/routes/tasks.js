@@ -7,6 +7,12 @@ router.get("/", async (req, res) => {
   try {
     const { userId } = req.query;
 
+    if (!userId) {
+      return res.status(400).json({
+        message: "userId is required",
+      });
+    }
+
     const tasks = await Task.find({ userId });
 
     res.json(tasks);
@@ -16,7 +22,6 @@ router.get("/", async (req, res) => {
     });
   }
 });
-
 // CREATE TASK
 router.post("/", async (req, res) => {
   try {
