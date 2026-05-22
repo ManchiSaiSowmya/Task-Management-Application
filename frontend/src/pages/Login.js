@@ -19,30 +19,45 @@ const Login = () => {
   };
 
   // Handle login
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+ const handleSubmit = async (e) => {
+  e.preventDefault();
 
-    try {
-      const res = await loginUser(form);
+  try {
+    const res = await loginUser(form);
 
-      console.log("LOGIN SUCCESS:", res.data);
+    console.log("LOGIN SUCCESS:", res.data);
 
-      // Save token
-      localStorage.setItem(
-        "token",
-        res.data.token
-      );
+    // Save token
+    localStorage.setItem(
+      "token",
+      res.data.token
+    );
 
-      // Save user
-     localStorage.setItem(
-  "token",
-  response.data.token
-);
+    // Save FULL USER OBJECT
+    localStorage.setItem(
+      "user",
+      JSON.stringify(res.data.user)
+    );
 
-localStorage.setItem(
-  "user",
-  JSON.stringify(response.data.user)
-);
+    console.log(
+      "SAVED USER:",
+      res.data.user
+    );
+
+    // Redirect
+    navigate("/dashboard");
+
+  } catch (err) {
+    console.log("LOGIN ERROR:", err.response);
+
+    alert(
+      err.response?.data?.message ||
+      err.response?.data ||
+      err.message ||
+      "Login failed"
+    );
+  }
+};
 
       // Redirect to dashboard
       navigate("/dashboard");
