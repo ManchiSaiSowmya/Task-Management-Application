@@ -10,65 +10,64 @@ const API_URL = "https://task-manager-api-np4w.onrender.com";
 const Dashboard = () => {
   const navigate = useNavigate();
 
+  const [user, setUser] = useState(null); // 👈 ADD HERE
+
   const [tasks, setTasks] = useState([]);
   const [taskTitle, setTaskTitle] = useState("");
   const [editingId, setEditingId] = useState(null);
   const [filter, setFilter] = useState("all");
   const [loading, setLoading] = useState(false);
 
-  // GET USER FROM LOCAL STORAGE
-  const user = JSON.parse(localStorage.getItem("user"));
-
   console.log("USER FROM STORAGE:", user);
 
+useEffect(() => {
+  const storedUser = localStorage.getItem("user");
+
+  if (storedUser) {
+    const parsed = JSON.parse(storedUser);
+    setUser(parsed);
+    console.log("USER LOADED:", parsed);
+  }
+}, []);
   // FETCH TASKS
- // FETCH TASKS
-  const fetchTasks = useCallback(async () => {
-    try {
-      if (!user?._id && !user?.id) {
-        console.error("Invalid user:", user);
-        return;
-      }
+ const fetchTasks = useCallback(async (userId) => {
+  try {
+    if (!userId) return;
 
-      setLoading(true);
+    setLoading(true);
 
-      const userId = user._id || user.id;
+    const res = await fetch(
+      `${API_URL}/tasks?userId=${userId}`
+    );
 
-      const res = await fetch(
-        `${API_URL}/tasks?userId=${userId}`
-      );
+    const data = await res.json();
 
-      const data = await res.json();
+    const normalized = Array.isArray(data)
+      ? data
+      : data.tasks || [];
 
-      console.log("FETCH TASKS RESPONSE:", data);
+    const sortedTasks = normalized.sort(
+      (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
+    );
 
-      const normalized = Array.isArray(data)
-        ? data
-        : data.tasks || [];
+    setTasks(sortedTasks);
+  } catch (err) {
+    console.log("FETCH ERROR:", err);
+  } finally {
+    setLoading(false);
+  }
+}, []);
 
-      const sortedTasks = normalized.sort(
-        (a, b) =>
-          new Date(b.createdAt) -
-          new Date(a.createdAt)
-      );
+  
+useEffect(() => {
+  if (!user) return;
 
-      setTasks(sortedTasks);
-    } catch (err) {
-      console.log("FETCH ERROR:", err);
-    } finally {
-      setLoading(false);
-    }
-  }, [user]); // Only recreate this function if the user object changes
-  // CHECK LOGIN + LOAD TASKS
-  // CHECK LOGIN + LOAD TASKS
-  useEffect(() => {
-    if (!user) {
-      navigate("/login");
-      return;
-    }
+  const userId = user._id || user.id;
+  if (!userId) return;
 
-    fetchTasks();
-  }, [user, navigate, fetchTasks]); // This is perfectly safe now!
+  fetchTasks(userId);
+}, [user, fetchTasks]);
+
   // CREATE TASK
   const handleCreateTask = async () => {
     if (!taskTitle.trim()) return;
