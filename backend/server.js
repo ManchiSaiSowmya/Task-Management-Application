@@ -6,7 +6,11 @@ require("dotenv").config();
 const app = express();
 
 // Middleware
-app.use(cors());
+app.use(cors({
+  origin: "https://task-management-application-k9yn0lgme.vercel.app",
+  methods: ["GET", "POST", "PUT", "PATCH", "DELETE"],
+  credentials: true
+}));
 app.use(express.json());
 
 // TEST ROUTE (important for debugging)

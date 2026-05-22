@@ -1,7 +1,6 @@
 import axios from "axios";
 
-const API = "http://localhost:5000";
-
+const API = "https://task-manager-api-np4w.onrender.com";
 export const loginUser = (data) =>
   axios.post(`${API}/auth/login`, data);
 

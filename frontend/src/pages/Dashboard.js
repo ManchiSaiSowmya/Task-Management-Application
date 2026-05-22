@@ -20,7 +20,7 @@ const Dashboard = () => {
     const user = JSON.parse(localStorage.getItem("user"));
 
     const res = await fetch(
-      `http://localhost:5000/tasks?userId=${user?.id}`
+      `https://task-manager-api-np4w.onrender.com/tasks?userId=${user?.id}`
     );
 
     const data = await res.json();
@@ -56,7 +56,7 @@ const Dashboard = () => {
   console.log("PAYLOAD SENT:", payload);
 
   try {
-    const res = await fetch("http://localhost:5000/tasks", {
+    const res = await fetch("https://task-manager-api-np4w.onrender.com/tasks", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -85,7 +85,7 @@ const Dashboard = () => {
   // DELETE TASK
   const handleDeleteTask = async (id) => {
     try {
-      await fetch(`http://localhost:5000/tasks/${id}`, {
+      await fetch(`https://task-manager-api-np4w.onrender.com/tasks/${id}`, {
         method: "DELETE",
       });
 
@@ -98,7 +98,7 @@ const Dashboard = () => {
   // TOGGLE COMPLETE
   const handleCompleteTask = async (id) => {
   try {
-    const res = await fetch(`http://localhost:5000/tasks/${id}`, {
+    const res = await fetch(`https://task-manager-api-np4w.onrender.com/tasks/${id}`, {
       method: "PATCH",
     });
 
@@ -122,7 +122,7 @@ const Dashboard = () => {
     if (!taskTitle.trim()) return;
 
     try {
-      const res = await fetch(`http://localhost:5000/tasks/${id}`, {
+      const res = await fetch(`https://task-manager-api-np4w.onrender.com/tasks/${id}`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
