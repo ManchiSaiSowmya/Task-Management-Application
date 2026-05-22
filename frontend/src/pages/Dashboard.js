@@ -11,8 +11,8 @@ const Dashboard = () => {
   const [filter, setFilter] = useState("all");
 
   useEffect(() => {
-    fetchTasks();
-  }, []);
+  fetchTasks();
+}, [user?.id]);
 
   // FETCH TASKS
  const fetchTasks = async () => {
@@ -20,7 +20,7 @@ const Dashboard = () => {
     const user = JSON.parse(localStorage.getItem("user"));
 
     const res = await fetch(
-      `https://task-manager-api-np4w.onrender.com/tasks?userId=${user?._id}`
+      `https://task-manager-api-np4w.onrender.com/tasks?userId=${user?.id}`
     );
 
     const data = await res.json();
@@ -50,7 +50,7 @@ const Dashboard = () => {
 
   const payload = {
     title: taskTitle,
-    userId: user?._id,   
+    userId:user?.id,   
   };
 
   console.log("PAYLOAD SENT:", payload);

@@ -34,10 +34,14 @@ const Login = () => {
       );
 
       // Save user
-      localStorage.setItem(
-        "user",
-        JSON.stringify(res.data.user)
-      );
+     localStorage.setItem(
+  "user",
+  JSON.stringify({
+    id: res.data.user._id,
+    username: res.data.user.username,
+    email: res.data.user.email
+  })
+);
 
       // Redirect to dashboard
       navigate("/dashboard");
