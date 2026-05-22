@@ -20,7 +20,7 @@ const Dashboard = () => {
     const user = JSON.parse(localStorage.getItem("user"));
 
     const res = await fetch(
-      `https://task-manager-api-np4w.onrender.com/tasks?userId=${user?.id}`
+      `https://task-manager-api-np4w.onrender.com/tasks?userId=${user?._id}`
     );
 
     const data = await res.json();
@@ -50,7 +50,7 @@ const Dashboard = () => {
 
   const payload = {
     title: taskTitle,
-    userId: user?.id,   // ✅ FIXED HERE
+    userId: user?._id,   
   };
 
   console.log("PAYLOAD SENT:", payload);
@@ -195,7 +195,7 @@ const Dashboard = () => {
         {/* HEADER */}
         <div style={styles.header}>
           <h1>Welcome, {user?.username} 👋</h1>
-          <p>{user?.email}</p>
+          <p>Email:{user?.email}</p>
         </div>
 
         
