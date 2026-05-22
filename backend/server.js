@@ -32,7 +32,10 @@ app.use((req, res) => {
   res.status(404).json({ message: "Route not found" });
 });
 
+
 // DB + SERVER START
+mongoose.set("strictQuery", false);
+
 mongoose
   .connect(process.env.MONGO_URI)
   .then(() => {
@@ -45,5 +48,4 @@ mongoose
   .catch((err) => {
     console.log("DB Connection Error:", err);
   });
-
   
