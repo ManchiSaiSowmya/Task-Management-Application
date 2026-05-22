@@ -19,14 +19,51 @@ const Dashboard = () => {
 
   // CHECK LOGIN
   useEffect(() => {
-    if (!user) {
-      navigate("/login");
-      return;
+  const fetchTasks = async () => {
+    try {
+      if (!user?._id && !user?.id) {
+        console.error("Invalid user:", user);
+        return;
+      }
+
+      setLoading(true);
+
+      const userId = user._id || user.id;
+
+      const res = await fetch(
+        `${API_URL}/tasks?userId=${userId}`
+      );
+
+      const data = await res.json();
+
+      console.log("FETCH TASKS RESPONSE:", data);
+
+      const normalized = Array.isArray(data)
+        ? data
+        : data.tasks || [];
+
+      const sortedTasks = normalized.sort(
+        (a, b) =>
+          new Date(b.createdAt) -
+          new Date(a.createdAt)
+      );
+
+      setTasks(sortedTasks);
+    } catch (err) {
+      console.log("FETCH ERROR:", err);
+    } finally {
+      setLoading(false);
     }
+  };
 
-    fetchTasks();
-  }, []);
+  if (!user) {
+    navigate("/login");
+    return;
+  }
 
+  fetchTasks();
+
+}, [user, navigate]);
   // FETCH TASKS
   const fetchTasks = async () => {
     try {
