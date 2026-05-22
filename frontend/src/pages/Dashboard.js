@@ -5,6 +5,9 @@ const Dashboard = () => {
   const navigate = useNavigate();
   const user = JSON.parse(localStorage.getItem("user"));
 
+    console.log("USER FROM STORAGE:", localStorage.getItem("user"));
+  console.log("PARSED USER:", user);
+  
   const [tasks, setTasks] = useState([]);
   const [taskTitle, setTaskTitle] = useState("");
   const [editingId, setEditingId] = useState(null);
@@ -25,7 +28,7 @@ if (!user?._id) {
 }
 
     const res = await fetch(
-      `https://task-manager-api-np4w.onrender.com/tasks?userId=${user._id}`
+      `https://task-manager-api-np4w.onrender.com/tasks?userId=${user._id || user.id}`
     );
 
     const data = await res.json();
@@ -60,7 +63,7 @@ if (!user?._id) {
 
   const payload = {
     title: taskTitle,
-    userId:user._id,   
+    userId: user?._id || user?.id  
   };
 
   console.log("PAYLOAD SENT:", payload);

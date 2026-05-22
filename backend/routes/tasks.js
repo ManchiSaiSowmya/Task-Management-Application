@@ -3,23 +3,32 @@ const router = express.Router();
 const Task = require("../models/Task"); // ✅ FIXED IMPORT
 
 // GET TASKS
-router.get("/", async (req, res) => {
+router.post("/", async (req, res) => {
   try {
-    const { userId } = req.query;
+    const { title, userId } = req.body;
 
-    if (!userId) {
+    if (!title || !userId) {
       return res.status(400).json({
-        message: "userId is required",
+        message: "title and userId are required",
       });
     }
 
-    const tasks = await Task.find({ userId });
+    if (!mongoose.Types.ObjectId.isValid(userId)) {
+      return res.status(400).json({ message: "Invalid userId format" });
+    }
 
-    res.json(tasks);
-  } catch (error) {
-    res.status(500).json({
-      message: error.message,
+    const task = new Task({
+      title,
+      userId,
+      completed: false,
     });
+
+    await task.save();
+
+    res.json(task);
+  } catch (error) {
+    console.log("CREATE TASK ERROR:", error);
+    res.status(500).json({ message: error.message });
   }
 });
 // CREATE TASK
