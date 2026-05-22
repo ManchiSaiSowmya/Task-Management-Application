@@ -12,10 +12,11 @@ const app = express();
 app.use(cors({
   origin: function (origin, callback) {
     const allowedOrigins = [
-      "https://task-management-application-eta-black.vercel.app",
-      "https://task-management-application-k9yn0lgme.vercel.app",
-      "http://localhost:3000"
-    ];
+  "https://task-management-application-eta-black.vercel.app",
+  "https://task-management-application-k9yn0lgme.vercel.app",
+  "https://task-management-application-tlqkdhd59.vercel.app",
+  "http://localhost:3000"
+];
 
     if (!origin || allowedOrigins.includes(origin)) {
       callback(null, true);
