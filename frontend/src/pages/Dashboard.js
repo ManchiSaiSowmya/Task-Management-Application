@@ -22,7 +22,8 @@ const Dashboard = () => {
   console.log("USER FROM STORAGE:", user);
 
   // FETCH TASKS
-  const fetchTasks = async () => {
+ // FETCH TASKS
+  const fetchTasks = useCallback(async () => {
     try {
       if (!user?._id && !user?.id) {
         console.error("Invalid user:", user);
@@ -57,8 +58,8 @@ const Dashboard = () => {
     } finally {
       setLoading(false);
     }
-  };
-
+  }, [user]); // Only recreate this function if the user object changes
+  // CHECK LOGIN + LOAD TASKS
   // CHECK LOGIN + LOAD TASKS
   useEffect(() => {
     if (!user) {
@@ -67,8 +68,7 @@ const Dashboard = () => {
     }
 
     fetchTasks();
-  },  [user, navigate, fetchTasks]);
-
+  }, [user, navigate, fetchTasks]); // This is perfectly safe now!
   // CREATE TASK
   const handleCreateTask = async () => {
     if (!taskTitle.trim()) return;
