@@ -1,163 +1,195 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
+const API_URL = "https://task-manager-api-np4w.onrender.com";
+
 const Dashboard = () => {
   const navigate = useNavigate();
-  const user = JSON.parse(localStorage.getItem("user"));
 
-    console.log("USER FROM STORAGE:", localStorage.getItem("user"));
-  console.log("PARSED USER:", user);
-  
   const [tasks, setTasks] = useState([]);
   const [taskTitle, setTaskTitle] = useState("");
   const [editingId, setEditingId] = useState(null);
   const [filter, setFilter] = useState("all");
+  const [loading, setLoading] = useState(false);
 
-  useEffect(() => {
-  fetchTasks();
-}, [user?.id]);
-
-  // FETCH TASKS
- const fetchTasks = async () => {
-  try {
-    const user = JSON.parse(localStorage.getItem("user"));
-
-if (!user?._id) {
-  console.error("Invalid user in localStorage:", user);
-  return;
-}
-
-    const res = await fetch(
-      `https://task-manager-api-np4w.onrender.com/tasks?userId=${user._id || user.id}`
-    );
-
-    const data = await res.json();
-
-    const normalized = Array.isArray(data)
-      ? data
-      : data.tasks || [];
-
-    const sorted = normalized.sort(
-      (a, b) =>
-        new Date(b.createdAt) - new Date(a.createdAt)
-    );
-
-    setTasks(sorted);
-  } catch (err) {
-    console.log(err);
-  }
-};
-  // CREATE TASK
-  const handleCreateTask = async () => {
-  if (!taskTitle.trim()) return;
-
+  // GET USER FROM LOCAL STORAGE
   const user = JSON.parse(localStorage.getItem("user"));
 
-if (!user?._id) {
-  console.error("Invalid user in localStorage:", user);
-  return;
-}
+  console.log("USER FROM STORAGE:", user);
 
-  console.log("TASK TITLE:", taskTitle);
-  console.log("USER:", user);
-
-  const payload = {
-    title: taskTitle,
-    userId: user?._id || user?.id  
-  };
-
-  console.log("PAYLOAD SENT:", payload);
-
-  try {
-    const res = await fetch("https://task-manager-api-np4w.onrender.com/tasks", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(payload),
-    });
-
-    const data = await res.json();
-
-    console.log("RESPONSE:", data);
-
-    if (!res.ok) {
-      alert(data.message);
+  // CHECK LOGIN
+  useEffect(() => {
+    if (!user) {
+      navigate("/login");
       return;
     }
 
-    const newTask = data.task || data;
+    fetchTasks();
+  }, []);
 
-    setTasks((prev) => [newTask, ...prev]);
-    setTaskTitle("");
-  } catch (err) {
-    console.log("Create error:", err);
-  }
-};
+  // FETCH TASKS
+  const fetchTasks = async () => {
+    try {
+      if (!user?._id && !user?.id) {
+        console.error("Invalid user:", user);
+        return;
+      }
+
+      setLoading(true);
+
+      const userId = user._id || user.id;
+
+      const res = await fetch(
+        `${API_URL}/tasks?userId=${userId}`
+      );
+
+      const data = await res.json();
+
+      console.log("FETCH TASKS RESPONSE:", data);
+
+      const normalized = Array.isArray(data)
+        ? data
+        : data.tasks || [];
+
+      const sortedTasks = normalized.sort(
+        (a, b) =>
+          new Date(b.createdAt) -
+          new Date(a.createdAt)
+      );
+
+      setTasks(sortedTasks);
+    } catch (err) {
+      console.log("FETCH ERROR:", err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // CREATE TASK
+  const handleCreateTask = async () => {
+    if (!taskTitle.trim()) return;
+
+    try {
+      const userId = user?._id || user?.id;
+
+      if (!userId) {
+        alert("User ID missing");
+        return;
+      }
+
+      const payload = {
+        title: taskTitle,
+        userId,
+      };
+
+      console.log("CREATE PAYLOAD:", payload);
+
+      const res = await fetch(`${API_URL}/tasks`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(payload),
+      });
+
+      const data = await res.json();
+
+      console.log("CREATE RESPONSE:", data);
+
+      if (!res.ok) {
+        alert(data.message || "Task creation failed");
+        return;
+      }
+
+      const newTask = data.task || data;
+
+      setTasks((prev) => [newTask, ...prev]);
+
+      setTaskTitle("");
+    } catch (err) {
+      console.log("CREATE ERROR:", err);
+    }
+  };
 
   // DELETE TASK
   const handleDeleteTask = async (id) => {
     try {
-      await fetch(`https://task-manager-api-np4w.onrender.com/tasks/${id}`, {
+      await fetch(`${API_URL}/tasks/${id}`, {
         method: "DELETE",
       });
 
-      setTasks((prev) => prev.filter((task) => task._id !== id));
+      setTasks((prev) =>
+        prev.filter((task) => task._id !== id)
+      );
     } catch (err) {
-      console.log("Delete error:", err);
+      console.log("DELETE ERROR:", err);
     }
   };
 
   // TOGGLE COMPLETE
   const handleCompleteTask = async (id) => {
-  try {
-    const res = await fetch(`https://task-manager-api-np4w.onrender.com/tasks/${id}`, {
-      method: "PATCH",
-    });
+    try {
+      const res = await fetch(
+        `${API_URL}/tasks/${id}`,
+        {
+          method: "PATCH",
+        }
+      );
 
-    const data = await res.json();
-    const updatedTask = data.task || data;
+      const data = await res.json();
 
-    setTasks((prev) =>
-      prev.map((task) =>
-        task._id === id
-          ? { ...task, completed: updatedTask.completed }
-          : task
-      )
-    );
-  } catch (err) {
-    console.log(err);
-  }
-};
+      const updatedTask = data.task || data;
+
+      setTasks((prev) =>
+        prev.map((task) =>
+          task._id === id
+            ? {
+                ...task,
+                completed: updatedTask.completed,
+              }
+            : task
+        )
+      );
+    } catch (err) {
+      console.log("COMPLETE ERROR:", err);
+    }
+  };
 
   // EDIT TASK
   const handleEditTask = async (id) => {
     if (!taskTitle.trim()) return;
 
     try {
-      const res = await fetch(`https://task-manager-api-np4w.onrender.com/tasks/${id}`, {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          title: taskTitle,
-        }),
-      });
+      const res = await fetch(
+        `${API_URL}/tasks/${id}`,
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type":
+              "application/json",
+          },
+          body: JSON.stringify({
+            title: taskTitle,
+          }),
+        }
+      );
 
       const data = await res.json();
+
       const updatedTask = data.task || data;
 
       setTasks((prev) =>
         prev.map((task) =>
-          task._id === id ? updatedTask : task
+          task._id === id
+            ? updatedTask
+            : task
         )
       );
 
       setEditingId(null);
       setTaskTitle("");
     } catch (err) {
-      console.log("Edit error:", err);
+      console.log("EDIT ERROR:", err);
     }
   };
 
@@ -169,37 +201,47 @@ if (!user?._id) {
 
   // FILTER TASKS
   const filteredTasks = tasks.filter((task) => {
-  if (filter === "completed") return task.completed === true;
-  if (filter === "ongoing") return task.completed === false;
-  return true;
-});
+    if (filter === "completed")
+      return task.completed === true;
+
+    if (filter === "ongoing")
+      return task.completed === false;
+
+    return true;
+  });
 
   return (
     <div style={styles.page}>
       {/* NAVBAR */}
       <div style={styles.navbar}>
-        <div style={styles.logo}>TASK MANAGER</div>
+        <div style={styles.logo}>
+          TASK MANAGER
+        </div>
 
         <div style={styles.navLinks}>
-          {["all", "ongoing", "completed"].map((type) => (
-            <button
-              key={type}
-              onClick={() => setFilter(type)}
-              style={{
-                ...styles.navBtn,
-                background:
-                  filter === type
-                    ? "#6366f1"
-                    : "#374151",
-              }}
-            >
-              {type === "all"
-                ? "Home"
-                : type === "ongoing"
-                ? "Ongoing"
-                : "Completed"}
-            </button>
-          ))}
+          {["all", "ongoing", "completed"].map(
+            (type) => (
+              <button
+                key={type}
+                onClick={() =>
+                  setFilter(type)
+                }
+                style={{
+                  ...styles.navBtn,
+                  background:
+                    filter === type
+                      ? "#6366f1"
+                      : "#374151",
+                }}
+              >
+                {type === "all"
+                  ? "Home"
+                  : type === "ongoing"
+                  ? "Ongoing"
+                  : "Completed"}
+              </button>
+            )
+          )}
         </div>
       </div>
 
@@ -207,11 +249,16 @@ if (!user?._id) {
       <div style={styles.container}>
         {/* HEADER */}
         <div style={styles.header}>
-          <h1>Welcome, {user?.username} 👋</h1>
-          <p>Email:{user?.email}</p>
-        </div>
+          <h1>
+            Welcome,{" "}
+            {user?.username || "User"} 👋
+          </h1>
 
-        
+          <p>
+            Email:{" "}
+            {user?.email || "No email"}
+          </p>
+        </div>
 
         {/* INPUT */}
         <div style={styles.inputBox}>
@@ -224,7 +271,6 @@ if (!user?._id) {
             placeholder="Write your task..."
             style={styles.input}
           />
-          
 
           {editingId ? (
             <button
@@ -244,80 +290,93 @@ if (!user?._id) {
             </button>
           )}
         </div>
-          <h2 style={{ color: "#fff" }}>Task List</h2>
-        {/* TASK LIST */}
-        {/* TASK LIST */}
-<div style={styles.grid}>
-  {filteredTasks.length === 0 ? (
-    <p style={{ color: "#aaa" }}>
-      No tasks found
-    </p>
-  ) : (
-    filteredTasks.map((task, index) => (
-      <div
-        key={task._id || index}
-        style={styles.card}
-      >
-        <div>
-          <h3
-            style={{
-              margin: 0,
-              textDecoration: task.completed
-                ? "line-through"
-                : "none",
-            }}
-          >
-            {task.title ||
-              task.task ||
-              task.name ||
-              JSON.stringify(task)}
-          </h3>
 
-          <small style={{ color: "#666" }}>
-            {task.completed
-              ? "Completed"
-              : "Pending"}
-          </small>
+        <h2 style={{ color: "#fff" }}>
+          Task List
+        </h2>
+
+        {/* TASKS */}
+        <div style={styles.grid}>
+          {loading ? (
+            <p style={{ color: "#fff" }}>
+              Loading...
+            </p>
+          ) : filteredTasks.length === 0 ? (
+            <p style={{ color: "#aaa" }}>
+              No tasks found
+            </p>
+          ) : (
+            filteredTasks.map((task, index) => (
+              <div
+                key={task._id || index}
+                style={styles.card}
+              >
+                <div>
+                  <h3
+                    style={{
+                      margin: 0,
+                      textDecoration:
+                        task.completed
+                          ? "line-through"
+                          : "none",
+                    }}
+                  >
+                    {task.title}
+                  </h3>
+
+                  <small
+                    style={{
+                      color: "#666",
+                    }}
+                  >
+                    {task.completed
+                      ? "Completed"
+                      : "Pending"}
+                  </small>
+                </div>
+
+                <div style={styles.actions}>
+                  <button
+                    onClick={() =>
+                      handleCompleteTask(
+                        task._id
+                      )
+                    }
+                    style={styles.green}
+                  >
+                    ✓
+                  </button>
+
+                  <button
+                    onClick={() => {
+                      setEditingId(
+                        task._id
+                      );
+
+                      setTaskTitle(
+                        task.title
+                      );
+                    }}
+                    style={styles.blue}
+                  >
+                    ✎
+                  </button>
+
+                  <button
+                    onClick={() =>
+                      handleDeleteTask(
+                        task._id
+                      )
+                    }
+                    style={styles.red}
+                  >
+                    🗑
+                  </button>
+                </div>
+              </div>
+            ))
+          )}
         </div>
-
-        <div style={styles.actions}>
-          <button
-            onClick={() =>
-              handleCompleteTask(task._id)
-            }
-            style={styles.green}
-          >
-            ✓
-          </button>
-
-          <button
-            onClick={() => {
-              setEditingId(task._id);
-              setTaskTitle(
-                task.title ||
-                  task.task ||
-                  task.name ||
-                  ""
-              );
-            }}
-            style={styles.blue}
-          >
-            ✎
-          </button>
-
-          <button
-            onClick={() =>
-              handleDeleteTask(task._id)
-            }
-            style={styles.red}
-          >
-            🗑
-          </button>
-        </div>
-      </div>
-    ))
-  )}
-</div>
 
         {/* LOGOUT */}
         <button
