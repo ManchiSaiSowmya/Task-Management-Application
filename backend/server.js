@@ -6,8 +6,14 @@ require("dotenv").config();
 const app = express();
 
 // Middleware
+const cors = require("cors");
+
 app.use(cors({
-  origin: "https://task-management-application-k9yn0lgme.vercel.app",
+  origin: [
+    "https://task-management-application-eta-black.vercel.app",
+    "https://task-management-application-k9yn0lgme.vercel.app",
+    "http://localhost:3000"
+  ],
   methods: ["GET", "POST", "PUT", "PATCH", "DELETE"],
   credentials: true
 }));
