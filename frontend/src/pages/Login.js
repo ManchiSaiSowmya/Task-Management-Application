@@ -19,47 +19,32 @@ const Login = () => {
   };
 
   // Handle login
- const handleSubmit = async (e) => {
-  e.preventDefault();
+  const handleSubmit = async (e) => {
+    e.preventDefault();
 
-  try {
-    const res = await loginUser(form);
+    try {
+      const res = await loginUser(form);
 
-    console.log("LOGIN SUCCESS:", res.data);
+      console.log("LOGIN SUCCESS:", res.data);
 
-    // Save token
-    localStorage.setItem(
-      "token",
-      res.data.token
-    );
+      // Save token
+      localStorage.setItem(
+        "token",
+        res.data.token
+      );
 
-    // Save FULL USER OBJECT
-    localStorage.setItem(
-      "user",
-      JSON.stringify(res.data.user)
-    );
+      // Save FULL USER OBJECT
+      localStorage.setItem(
+        "user",
+        JSON.stringify(res.data.user)
+      );
 
-    console.log(
-      "SAVED USER:",
-      res.data.user
-    );
+      console.log(
+        "SAVED USER:",
+        res.data.user
+      );
 
-    // Redirect
-    navigate("/dashboard");
-
-  } catch (err) {
-    console.log("LOGIN ERROR:", err.response);
-
-    alert(
-      err.response?.data?.message ||
-      err.response?.data ||
-      err.message ||
-      "Login failed"
-    );
-  }
-};
-
-      // Redirect to dashboard
+      // Redirect
       navigate("/dashboard");
 
     } catch (err) {
@@ -117,122 +102,120 @@ const Login = () => {
         </form>
 
         <p style={styles.linkText}>
-          Don't have an account? <Link to="/register">Register</Link>
+          Don't have an account?{" "}
+          <Link to="/register">Register</Link>
         </p>
       </div>
     </div>
   );
 };
-  const styles = {
-    page: {
-      height: "100vh",
-      display: "flex",
-      justifyContent: "center",
-      alignItems: "center",
-      position: "relative",
-      overflow: "hidden",
-      background: "#0a0a0a",
-    },
 
-    bg: {
-      position: "absolute",
-      width: "200%",
-      height: "200%",
-      background:
-        "linear-gradient(45deg, #ff0080, #7928ca, #00c6ff, #38ef7d)",
-      animation: "moveBg 8s linear infinite",
-      opacity: 0.25,
-    },
+const styles = {
+  page: {
+    height: "100vh",
+    display: "flex",
+    justifyContent: "center",
+    alignItems: "center",
+    position: "relative",
+    overflow: "hidden",
+    background: "#0a0a0a",
+  },
 
-    box: {
-      position: "relative",
-      zIndex: 10,
-      width: "360px",
-      padding: "35px",
-      background: "#111827",
-      borderRadius: "16px",
-      boxShadow: "0 0 25px rgba(255,255,255,0.1)",
-      border: "1px solid rgba(255,255,255,0.1)",
-      textAlign: "center",
-    },
+  bg: {
+    position: "absolute",
+    width: "200%",
+    height: "200%",
+    background:
+      "linear-gradient(45deg, #ff0080, #7928ca, #00c6ff, #38ef7d)",
+    animation: "moveBg 8s linear infinite",
+    opacity: 0.25,
+  },
 
-    title: {
-      color: "#00c6ff",
-      marginBottom: "5px",
-      letterSpacing: "1px",
-    },
+  box: {
+    position: "relative",
+    zIndex: 10,
+    width: "360px",
+    padding: "35px",
+    background: "#111827",
+    borderRadius: "16px",
+    boxShadow: "0 0 25px rgba(255,255,255,0.1)",
+    border: "1px solid rgba(255,255,255,0.1)",
+    textAlign: "center",
+  },
 
-    subtitle: {
-      color: "#fff",
-      marginBottom: "20px",
-    },
+  title: {
+    color: "#00c6ff",
+    marginBottom: "5px",
+    letterSpacing: "1px",
+  },
 
-    input: {
-      width: "100%",
-      padding: "12px",
-      margin: "10px 0",
-      borderRadius: "8px",
-      border: "none",
-      outline: "none",
-      background: "#1f2937",
-      color: "#fff",
-      borderLeft: "4px solid #00c6ff",
-    },
+  subtitle: {
+    color: "#fff",
+    marginBottom: "20px",
+  },
 
-    button: {
-      width: "100%",
-      padding: "12px",
-      marginTop: "10px",
-      border: "none",
-      borderRadius: "8px",
-      background: "linear-gradient(90deg, #ff0080, #7928ca)",
-      color: "#fff",
-      fontWeight: "bold",
-      cursor: "pointer",
-      transition: "0.3s",
-    },
+  input: {
+    width: "100%",
+    padding: "12px",
+    margin: "10px 0",
+    borderRadius: "8px",
+    border: "none",
+    outline: "none",
+    background: "#1f2937",
+    color: "#fff",
+    borderLeft: "4px solid #00c6ff",
+  },
 
-    linkText: {
-      marginTop: "15px",
-      color: "#ccc",
-    },
+  button: {
+    width: "100%",
+    padding: "12px",
+    marginTop: "10px",
+    border: "none",
+    borderRadius: "8px",
+    background: "linear-gradient(90deg, #ff0080, #7928ca)",
+    color: "#fff",
+    fontWeight: "bold",
+    cursor: "pointer",
+    transition: "0.3s",
+  },
 
-    // floating shapes
-    circle1: {
-      position: "absolute",
-      width: "200px",
-      height: "200px",
-      background: "#ff0080",
-      borderRadius: "50%",
-      top: "10%",
-      left: "10%",
-      filter: "blur(60px)",
-      animation: "float 6s ease-in-out infinite",
-    },
+  linkText: {
+    marginTop: "15px",
+    color: "#ccc",
+  },
 
-    circle2: {
-      position: "absolute",
-      width: "250px",
-      height: "250px",
-      background: "#00c6ff",
-      borderRadius: "50%",
-      bottom: "10%",
-      right: "15%",
-      filter: "blur(70px)",
-      animation: "float 8s ease-in-out infinite",
-    },
+  circle1: {
+    position: "absolute",
+    width: "200px",
+    height: "200px",
+    background: "#ff0080",
+    borderRadius: "50%",
+    top: "10%",
+    left: "10%",
+    filter: "blur(60px)",
+  },
 
-    circle3: {
-      position: "absolute",
-      width: "180px",
-      height: "180px",
-      background: "#38ef7d",
-      borderRadius: "50%",
-      top: "50%",
-      left: "50%",
-      filter: "blur(80px)",
-      animation: "float 10s ease-in-out infinite",
-    },
-  };
+  circle2: {
+    position: "absolute",
+    width: "250px",
+    height: "250px",
+    background: "#00c6ff",
+    borderRadius: "50%",
+    bottom: "10%",
+    right: "15%",
+    filter: "blur(70px)",
+  },
 
-  export default Login;
+  circle3: {
+    position: "absolute",
+    width: "180px",
+    height: "180px",
+    background: "#38ef7d",
+    borderRadius: "50%",
+    top: "50%",
+    left: "50%",
+    filter: "blur(80px)",
+  },
+};
+
+export default Login;
